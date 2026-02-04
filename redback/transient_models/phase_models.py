@@ -16,7 +16,8 @@ extinction_model_functions = {'supernova':extinction_models.extinction_with_supe
                               'tde':extinction_models.extinction_with_tde_base_model,
                               'magnetar_driven':extinction_models.extinction_with_magnetar_driven_base_model,
                               'shock_powered':extinction_models.extinction_with_shock_powered_base_model,
-                              'stellar_interaction':extinction_models.extinction_with_stellar_interaction_base_model}
+                              'stellar_interaction':extinction_models.extinction_with_stellar_interaction_base_model,
+                              'phenomenological':extinction_models.extinction_with_phenomenological_base_model}
 
 @citation_wrapper('redback')
 def t0_base_model(time, t0, **kwargs):
@@ -125,6 +126,27 @@ def t0_supernova_extinction(time, t0, av_host, **kwargs):
     :return: flux_density or magnitude depending on kwargs['output_format'] with extinction applied
     """
     summary = _t0_with_extinction(time=time, t0=t0, av_host=av_host, model_type='supernova', **kwargs)
+    return summary.observable
+
+@citation_wrapper('redback')
+def t0_blackbody_extinction(time, t0, av_host, **kwargs):
+    """
+    Evolving blackbody model with t0 parameter and host/MW extinction
+
+    :param time: time in mjd
+    :param t0: start time in mjd
+    :param av_host: V-band extinction from host galaxy in magnitudes
+    :param kwargs: Must be all the parameters required by the base_model specified using kwargs['base_model'] plus:
+        - redshift: source redshift (required)
+        - av_mw: MW V-band extinction in magnitudes (default 0.0)
+        - rv_host: host R_V parameter (default 3.1)
+        - rv_mw: MW R_V parameter (default 3.1)
+        - host_law: host extinction law (default 'fitzpatrick99')
+        - mw_law: MW extinction law (default 'fitzpatrick99')
+        Available extinction laws: 'fitzpatrick99', 'fm07', 'calzetti00', 'odonnell94', 'ccm89'
+    :return: flux_density or magnitude depending on kwargs['output_format'] with extinction applied
+    """
+    summary = _t0_with_extinction(time=time, t0=t0, av_host=av_host, model_type='phenomenological', **kwargs)
     return summary.observable
 
 @citation_wrapper('redback')
