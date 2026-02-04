@@ -62,6 +62,8 @@ extinction_shock_powered_base_models = ['shocked_cocoon', 'shock_cooling', 'csm_
                                         'shockcooling_morag', 'shockcooling_sapirandwaxman', 'shocked_cocoon_csm']
 extinction_stellar_interaction_models = ['wr_bh_merger']
 
+phenomenological_models = ['evolving_blackbody']
+
 extinction_model_library = {'kilonova': extinction_kilonova_base_models,
                             'supernova': extinction_supernova_base_models,
                             'general_synchrotron': extinction_general_synchrotron_models,
@@ -71,14 +73,16 @@ extinction_model_library = {'kilonova': extinction_kilonova_base_models,
                             'magnetar_driven': extinction_magnetar_driven_base_models,
                             'shock_powered': extinction_shock_powered_base_models,
                             'stellar_interaction': extinction_stellar_interaction_models,
-                            'integrated_flux_afterglow': extinction_integrated_flux_afterglow_models}                            
+                            'integrated_flux_afterglow': extinction_integrated_flux_afterglow_models,
+                            'phenomenological': phenomenological_models}                            
 
 model_library = {'supernova': 'supernova_models', 'afterglow': 'afterglow_models',
                  'magnetar_driven': 'magnetar_driven_ejecta_models', 'tde': 'tde_models',
                  'kilonova': 'kilonova_models', 'shock_powered': 'shock_powered_models',
                  'integrated_flux_afterglow': 'afterglow_models',
                  'stellar_interaction': 'stellar_interaction_models',
-                 'general_synchrotron': 'general_synchrotron_models'}
+                 'general_synchrotron': 'general_synchrotron_models',
+                 'phenomenological': 'phenomenological_models'}
 
 def _get_correct_function(base_model, model_type=None):
     """
@@ -456,6 +460,26 @@ def extinction_with_general_synchrotron_base_model(time, av_host, **kwargs):
     :return: set by kwargs['output_format'] - 'flux_density', 'magnitude', 'flux', 'spectra' with extinction applied
     """
     output = _evaluate_extinction_model(time=time, av_host=av_host, model_type='general_synchrotron', **kwargs)
+    return output
+
+@citation_wrapper('redback')
+def extinction_with_phenomenological_base_model(time, av_host, **kwargs):
+    """
+    Extinction with models implemented in general_synchrotron_models
+
+    :param time: time in observer frame in days
+    :param av_host: V-band extinction from host galaxy in magnitudes
+    :param kwargs: Must be all the parameters required by the base_model specified using kwargs['base_model'] plus:
+        - redshift: source redshift (required)
+        - av_mw: MW V-band extinction in magnitudes (default 0.0)
+        - rv_host: host R_V parameter (default 3.1)
+        - rv_mw: MW R_V parameter (default 3.1)
+        - host_law: host extinction law (default 'fitzpatrick99')
+        - mw_law: MW extinction law (default 'fitzpatrick99')
+        Available extinction laws: 'fitzpatrick99', 'fm07', 'calzetti00', 'odonnell94', 'ccm89'
+    :return: set by kwargs['output_format'] - 'flux_density', 'magnitude', 'flux', 'spectra' with extinction applied
+    """
+    output = _evaluate_extinction_model(time=time, av_host=av_host, model_type='phenomenological', **kwargs)
     return output
 
 @citation_wrapper('https://ui.adsabs.harvard.edu/abs/2021arXiv210601556S/abstract')
